@@ -13,6 +13,7 @@ from .code.message.vqa_message import VqaMessage
 from .code.misc.camera import Camera
 from .code.misc.receiver import Receiver
 from .code.misc.sender import Sender
+from .code.misc.text_normalizer import to_uniform
 from .default_config import DefaultConfig
 
 # TODO: Make sure "." before module name is not missing
@@ -78,8 +79,8 @@ class QuestionAnsweringSkill(MycroftSkill):
         # LOG.info('Handling ' + message)
         try:
             image, _ = self.camera.take_image()
-
-            msg = VqaMessage(image=image, question='hello')
+            question = to_uniform(message.data.get('question_words'))
+            msg = VqaMessage(image=image, question=question)
             sent = self.ensure_send(msg)
             if not sent:
                 self.speak_dialog('RegisterError')
