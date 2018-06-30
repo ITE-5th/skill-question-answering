@@ -75,7 +75,7 @@ class QuestionAnsweringSkill(MycroftSkill):
         return True
 
     @intent_handler(IntentBuilder("VqaIntent").require('question').require('question_words'))
-    def caption(self, message):
+    def answer(self, message):
         # LOG.info('Handling ' + message)
         try:
             image, _ = self.camera.take_image()
