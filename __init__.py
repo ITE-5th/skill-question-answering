@@ -78,7 +78,8 @@ class QuestionAnsweringSkill(MycroftSkill):
     def answer(self, message):
         try:
             image, _ = self.camera.take_image()
-            question = to_uniform(message.data.get('question_words'))
+            utterance = message.data.get('utterance')
+            question = to_uniform(''.join(utterance.split('question ')))
             msg = VqaMessage(image=image, question=question)
             LOG.info('sending question : ' + question)
 
