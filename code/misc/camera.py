@@ -44,10 +44,6 @@ class Camera:
         print(has_one_face)
         return has_one_face
 
-    def close(self):
-        self.camera.close()
-
-
 if __name__ == '__main__':
     c = Camera(width=800, height=600)
     for i in range(10):
