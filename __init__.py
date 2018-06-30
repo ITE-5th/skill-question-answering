@@ -88,7 +88,7 @@ class QuestionAnsweringSkill(MycroftSkill):
 
             response = self.receiver.receive()
             LOG.info(response)
-            result = self.handle_message(response)
+            result = self.handle_message(response.get('result'))
             self.speak_dialog("result", result)
 
         except Exception as e:
