@@ -102,6 +102,11 @@ class QuestionAnsweringSkill(MycroftSkill):
 
     @staticmethod
     def handle_message(response):
+        """
+        converts server response to meaningful sentence
+        :param response: string of answers
+        :return: dictionary contains sentence in result
+        """
         phrase = ''
         if response.strip() != '':
             answers = response.split(',')
@@ -109,7 +114,7 @@ class QuestionAnsweringSkill(MycroftSkill):
             for i in range(answers_count):
                 phrase += answers[i].capitalize() + (
                     ' . Or ' if i == answers_count - 2 and answers_count > 1 else ' . ')
-        return phrase
+        return {'result': phrase}
 
     def stop(self):
         super(QuestionAnsweringSkill, self).shutdown()
