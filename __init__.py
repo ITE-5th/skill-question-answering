@@ -76,11 +76,12 @@ class QuestionAnsweringSkill(MycroftSkill):
 
     @intent_handler(IntentBuilder("VqaIntent").require('question').require('question_words'))
     def answer(self, message):
-        # LOG.info('Handling ' + message)
         try:
             image, _ = self.camera.take_image()
             question = to_uniform(message.data.get('question_words'))
             msg = VqaMessage(image=image, question=question)
+            LOG.info('sending question : ' + question)
+
             sent = self.ensure_send(msg)
             if not sent:
                 self.speak_dialog('RegisterError')
