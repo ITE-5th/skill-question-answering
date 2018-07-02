@@ -35,8 +35,8 @@ class QuestionAnsweringSkill(MycroftSkill):
         super(QuestionAnsweringSkill, self).__init__("QuestionAnsweringSkill")
         LOG.warning('Running Skill Question Answering ')
 
-        if "server_url" not in self.settings:
-            self.settings["server_url"] = "192.168.43.243"
+        # if "server_url" not in self.settings:
+        #     self.settings["server_url"] = "192.168.43.243"
         self.socket = None
         self.receiver = None
         self.sender = None
