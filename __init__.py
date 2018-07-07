@@ -68,7 +68,6 @@ class QuestionAnsweringSkill(MycroftSkill):
             except Exception as e:
                 if retries <= 0:
                     LOG.warning('Cannot Connect')
-                    self.speak('Cannot Connect')
                     return False
                 self.connect()
                 LOG.warning(str(e))
@@ -85,19 +84,19 @@ class QuestionAnsweringSkill(MycroftSkill):
 
             sent = self.ensure_send(msg)
             if not sent:
-                self.speak_dialog('RegisterError')
+                self.speak_dialog('ConnectionError')
                 return False
 
             response = self.receiver.receive()
             LOG.info(response)
-            result = self.handle_message(response.get('result'))
+            result = self.handle_message(response.get('Result'))
             self.speak_dialog("result", result)
 
         except Exception as e:
             LOG.info('Something is wrong')
             LOG.info(str(e))
             LOG.info(str(traceback.format_exc()))
-            self.speak("Exception")
+            self.speak_dialog("UnknownError")
             self.connect()
             return False
         return True
