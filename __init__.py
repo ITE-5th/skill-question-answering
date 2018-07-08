@@ -113,7 +113,7 @@ class QuestionAnsweringSkill(MycroftSkill):
             answers = response.split(',')
             answers_count = len(answers)
             for i in range(answers_count):
-                answer = answers[i].capitalize()
+                answer = answers[i].strip().capitalize()
                 phrase += answer + (
                     ' . or ' if i == answers_count - 2 and answers_count > 1 else ' . ')
                 if any(char.isdigit() for char in answer) or answer in ('Yes', 'No'):
