@@ -75,7 +75,9 @@ class QuestionAnsweringSkill(MycroftSkill):
     @intent_handler(IntentBuilder("VqaIntent").require('question').optionally('question_words'))
     def answer(self, message):
         try:
+
             question = message.data.get("Question_Words", None)
+            print(message.data)
             if question is not None:
                 utterance = message.data.get('utterance')
                 question = to_uniform(''.join(utterance.split('question')))
