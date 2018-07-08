@@ -77,7 +77,7 @@ class QuestionAnsweringSkill(MycroftSkill):
         try:
 
             question = message.data.get("Question_Words", None)
-            print(message)
+            print(message.data.get("Question_Words"))
             if question is not None:
                 utterance = message.data.get('utterance')
                 question = to_uniform(''.join(utterance.split('question')))
