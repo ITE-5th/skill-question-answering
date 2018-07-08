@@ -81,7 +81,7 @@ class QuestionAnsweringSkill(MycroftSkill):
                 question = to_uniform(''.join(utterance.split('question')))
             else:
                 self.speak_dialog('GetQuestion')
-                question = self.get_question()
+                question = self.get_phrase()
 
             if question is None:
                 raise LookupError()
@@ -99,11 +99,9 @@ class QuestionAnsweringSkill(MycroftSkill):
 
         except LookupError as e:
             self.speak_dialog('GetQuestionError')
-            return True
 
         except ConnectionError as e:
             self.speak_dialog('ConnectionError')
-            return True
 
         except Exception as e:
             LOG.info('Something is wrong')
@@ -111,7 +109,6 @@ class QuestionAnsweringSkill(MycroftSkill):
             LOG.info(str(traceback.format_exc()))
             self.speak_dialog("UnknownError")
             self.connect()
-            return True
         return True
 
     @staticmethod
@@ -146,19 +143,17 @@ class QuestionAnsweringSkill(MycroftSkill):
         try:
             text = r.recognize_google(audio, language=lang)
             print("Google Speech Recognition thinks you said " + text)
-            return text
+
+            if text is not None or text.strip() != "":
+                return text
+            raise LookupError()
 
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
+            raise LookupError()
         except sr.RequestError as e:
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
-        return None
-
-    def get_question(self):
-        question = self.get_phrase()
-        if question is not None or question.strip() != "":
-            return question
-        return None
+            raise LookupError()
 
     def stop(self):
         super(QuestionAnsweringSkill, self).shutdown()
