@@ -72,12 +72,13 @@ class QuestionAnsweringSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    @intent_handler(IntentBuilder("VqaIntent").require('question').require('question_words'))
+    @intent_handler(IntentBuilder("VqaIntent").require('question').require('QuestionWords'))
     def answer(self, message):
         try:
 
-            question = message.data.get("Question_Words", None)
+            print(message.data)
             print(message.data.get("Question_Words"))
+            question = message.data.get("question_words", None)
             if question is not None:
                 utterance = message.data.get('utterance')
                 question = to_uniform(''.join(utterance.split('question')))
