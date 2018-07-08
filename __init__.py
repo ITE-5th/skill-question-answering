@@ -67,30 +67,43 @@ class QuestionAnsweringSkill(MycroftSkill):
                 break
             except Exception as e:
                 if retries <= 0:
-                    LOG.warning('Cannot Connect')
-                    return False
+                    raise ConnectionError()
                 self.connect()
                 LOG.warning(str(e))
         return True
 
-    @intent_handler(IntentBuilder("VqaIntent").require('question').require('question_words'))
+    @intent_handler(IntentBuilder("VqaIntent").require('question').optionally('question_words'))
     def answer(self, message):
         try:
+            question = message.data.get("Question_Words", None)
+            if question is not None:
+                utterance = message.data.get('utterance')
+                question = to_uniform(''.join(utterance.split('question')))
+            else:
+                self.speak_dialog('GetQuestion')
+                question = self.get_question()
+
+            if question is None:
+                raise LookupError()
+
             image, _ = self.camera.take_image()
-            utterance = message.data.get('utterance')
-            question = to_uniform(''.join(utterance.split('question')))
             msg = VqaMessage(image=image, question=question)
             LOG.info('sending question : ' + question)
 
-            sent = self.ensure_send(msg)
-            if not sent:
-                self.speak_dialog('ConnectionError')
-                return False
+            self.ensure_send(msg)
 
             response = self.receiver.receive()
             LOG.info(response)
             result = self.handle_message(response.get('result'))
             self.speak_dialog("Result", result)
+
+        except LookupError as e:
+            self.speak_dialog('GetQuestionError')
+            return True
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+            return True
 
         except Exception as e:
             LOG.info('Something is wrong')
@@ -98,7 +111,7 @@ class QuestionAnsweringSkill(MycroftSkill):
             LOG.info(str(traceback.format_exc()))
             self.speak_dialog("UnknownError")
             self.connect()
-            return False
+            return True
         return True
 
     @staticmethod
@@ -119,6 +132,33 @@ class QuestionAnsweringSkill(MycroftSkill):
                 if any(char.isdigit() for char in answer) or answer in ('Yes', 'No'):
                     break
         return {'result': phrase}
+
+    @staticmethod
+    def get_phrase(lang='en-US'):
+        import speech_recognition as sr
+        r = sr.Recognizer()
+
+        with sr.Microphone() as source:
+            print('recording...')
+            audio = r.listen(source)
+        print('fin recording...')
+
+        try:
+            text = r.recognize_google(audio, language=lang)
+            print("Google Speech Recognition thinks you said " + text)
+            return text
+
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        return None
+
+    def get_question(self):
+        question = self.get_phrase()
+        if question is not None or question.strip() != "":
+            return question
+        return None
 
     def stop(self):
         super(QuestionAnsweringSkill, self).shutdown()
