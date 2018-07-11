@@ -84,6 +84,7 @@ class QuestionAnsweringSkill(MycroftSkill):
             if question is not None:
                 utterance = message.data.get('utterance')
                 question = to_uniform(''.join(utterance.split('can i ask you')))
+                question = to_uniform(''.join(question.split('answer me')))
             else:
                 self.speak_dialog('GetQuestion')
                 question = self.get_phrase()
