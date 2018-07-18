@@ -5,7 +5,7 @@ Visual Question Answering Skill
 Answers questions about image from connected camera using remote server
 
 ## Examples
- * "Question what are they doing?"
+ * "Can i ask you what are they doing?"
 
 ## Credits
 ITE-5th
