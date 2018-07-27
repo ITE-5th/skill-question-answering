@@ -75,6 +75,26 @@ class QuestionAnsweringSkill(MycroftSkill):
         return True
 
     # @intent_handler(IntentBuilder("VqaIntent").require('Question'))
+    @intent_handler(IntentBuilder("VqaIntent").require('WhatsThis'))
+    def answer(self, message):
+        try:
+
+            self.vqa('what is this')
+
+        except LookupError as e:
+            self.speak_dialog('GetQuestionError')
+
+        except ConnectionError as e:
+            self.speak_dialog('ConnectionError')
+
+        except Exception as e:
+            LOG.info('Something is wrong')
+            LOG.info(str(e))
+            LOG.info(str(traceback.format_exc()))
+            self.speak_dialog("UnknownError")
+            self.connect()
+        return True
+
     @intent_handler(IntentBuilder("VqaIntent").require('Question').optionally('Sentence'))
     def answer(self, message):
         try:
@@ -93,16 +113,7 @@ class QuestionAnsweringSkill(MycroftSkill):
             if question is None:
                 raise LookupError()
 
-            image, _ = self.camera.take_image()
-            msg = VqaMessage(image=image, question=question)
-            LOG.info('sending question : ' + question)
-
-            self.ensure_send(msg)
-
-            response = self.receiver.receive()
-            LOG.info(response)
-            result = self.handle_message(response.get('result'))
-            self.speak_dialog("Result", result)
+            self.vqa(question)
 
         except LookupError as e:
             self.speak_dialog('GetQuestionError')
@@ -117,6 +128,16 @@ class QuestionAnsweringSkill(MycroftSkill):
             self.speak_dialog("UnknownError")
             self.connect()
         return True
+
+    def vqa(self, question):
+        image, _ = self.camera.take_image()
+        msg = VqaMessage(image=image, question=question)
+        LOG.info('sending question : ' + question)
+        self.ensure_send(msg)
+        response = self.receiver.receive()
+        LOG.info(response)
+        result = self.handle_message(response.get('result'))
+        self.speak_dialog("Result", result)
 
     @staticmethod
     def handle_message(response):
