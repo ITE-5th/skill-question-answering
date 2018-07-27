@@ -74,7 +74,6 @@ class QuestionAnsweringSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    # @intent_handler(IntentBuilder("VqaIntent").require('Question'))
     @intent_handler(IntentBuilder("VqaIntent").require('WhatsThis'))
     def answer(self, message):
         try:
