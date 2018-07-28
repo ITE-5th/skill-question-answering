@@ -74,10 +74,9 @@ class QuestionAnsweringSkill(MycroftSkill):
                 LOG.warning(str(e))
         return True
 
-    @intent_handler(IntentBuilder("VqaWhatsThis").require('WhatsThis'))
+    @intent_handler(IntentBuilder("VqaObjects").require('Objects'))
     def answer(self, message):
         try:
-
             self.vqa('what is this')
 
         except LookupError as e:
